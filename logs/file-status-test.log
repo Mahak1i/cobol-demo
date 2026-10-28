@@ -1,0 +1,23 @@
+######################################################################
+# FILE STATUS NEGATIVE TEST - LOANIN DATASET DOES NOT EXIST
+######################################################################
+
+//LOANRUN  STEP010 EXEC PGM=LOANCALC   PAYCALC=after
+//STEPLIB  DD build/after
+//LOANIN   DD data/NO-SUCH-FILE.DAT
+//AMORTOUT DD output/after/AMORTOUT.DAT
+//LOANRPT  DD output/after/LOANRPT.TXT
+
+LOANCALC - LOAN AMORTIZATION BATCH STARTED  2026-10-28
+**************************************************
+LOANCALC - ABNORMAL TERMINATION
+  PARAGRAPH  : 1100-OPEN-FILES               
+  REASON     : OPEN FAILED - LOANIN                              
+  FILE STATUS: 35
+  LAST LOAN  : (NONE)    
+  RECORDS READ +0000000
+**************************************************
+
+STEP010 LOANCALC ENDED - COND CODE 0016
+
+RESULT: PASS - OPEN FAILURE TRAPPED, STEP ENDED RC 16

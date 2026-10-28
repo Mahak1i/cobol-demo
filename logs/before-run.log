@@ -1,0 +1,99 @@
+######################################################################
+# LS0142 REGRESSION RUN - BEFORE FIX (src/before/PAYCALC.cbl)
+# 2026-10-28 15:52:10 UTC   cobc (GnuCOBOL) 3.1.2.0
+######################################################################
+
+//LOANRUN  STEP010 EXEC PGM=LOANCALC   PAYCALC=before
+//STEPLIB  DD build/before
+//LOANIN   DD data/LOANS.DAT
+//AMORTOUT DD output/before/AMORTOUT.DAT
+//LOANRPT  DD output/before/LOANRPT.TXT
+
+LOANCALC - LOAN AMORTIZATION BATCH STARTED  2026-10-28
+LOANCALC - REJECTED COM0000006 E6 PAYMENT DOES NOT COVER INTEREST         
+LOANCALC - REJECTED PER0000007 E6 PAYMENT DOES NOT COVER INTEREST         
+LOANCALC - REJECTED BAD0000013 E3 TERM MUST BE 001 - 480 MONTHS           
+LOANCALC - REJECTED BAD0000014 E1 PRINCIPAL IS NOT NUMERIC                
+LOANCALC - RECORDS READ    : +0000014
+LOANCALC - LOANS ACCEPTED  : +0000010
+LOANCALC - LOANS REJECTED  : +0000004
+LOANCALC - AMORTOUT RECORDS: +000001351
+LOANCALC - ENDED, RETURN CODE +000000004
+
+STEP010 LOANCALC ENDED - COND CODE 0004
+
+================================================================================================
+ LOANCALC RESULT VERIFICATION - BEFORE FIX (src/before/PAYCALC.cbl)
+ input    : data/LOANS.DAT
+ expected : tests/expected/EXPECTED-RESULTS.txt
+ actual   : output/before/AMORTOUT.DAT
+================================================================================================
+ RESULT LOAN ID             EXPECTED          ACTUAL   CASE
+ ------ ----------    --------------  --------------   ----------------------------------------
+ FAIL   MTG0000001          1,580.17        1,580.03   Standard 30-yr mortgage, 360 months
+ FAIL   MTG0000002          2,933.76        2,933.71   15-yr mortgage, fractional rate
+ FAIL   AUT0000003            647.38          647.35   60-month auto loan
+ FAIL   PER0000004            277.78          277.77   Zero-interest loan (P / n path)
+ PASS   PER0000005          5,050.00        5,050.00   1-month term (payment = P * (1+r))
+ FAIL   COM0000006      5,543,942.14       REJECT E6   Very large principal (950,000,000.00)
+ FAIL   PER0000007              0.09       REJECT E6   Very small principal (1.00)
+ FAIL   MTG0000008            556.39          554.78   Very low rate (0.01%), 360 months
+ FAIL   COM0000009            374.93          376.49   High rate (29.99%), 360 months
+ FAIL   AUT0000010            305.91          305.87   Half-cent rounding sensitivity
+ FAIL   COM0000011         REJECT E5    9,999,999.00   Payment exceeds field size -> reject
+ PASS   PER0000012              0.01            0.01   Tiny P, zero rate: payment 0.01
+ PASS   BAD0000013         REJECT E3       REJECT E3   Validation: zero term -> reject
+ PASS   BAD0000014         REJECT E1       REJECT E1   Validation: non-numeric principal
+
+ MISMATCH DETAIL
+ -----------------------------------------------------------------------------------------------
+ MTG0000001
+     level payment     expected           1,580.17   actual           1,580.03   diff -0.14
+     final payment     expected           1,580.55   actual           1,734.56   diff +154.01
+     total interest    expected         318,861.58   actual         318,965.33   diff +103.75
+     total paid        expected         568,861.58   actual         568,965.33   diff +103.75
+     schedule rows     360 expected, 360 actual, 360 differ (first at period 1)
+ MTG0000002
+     level payment     expected           2,933.76   actual           2,933.71   diff -0.05
+     final payment     expected           2,933.34   actual           2,945.39   diff +12.05
+     total interest    expected         128,076.38   actual         128,079.48   diff +3.10
+     total paid        expected         528,076.38   actual         528,079.48   diff +3.10
+     schedule rows     180 expected, 180 actual, 180 differ (first at period 1)
+ AUT0000003
+     level payment     expected             647.38   actual             647.35   diff -0.03
+     final payment     expected             647.32   actual             649.45   diff +2.13
+     total interest    expected           6,342.74   actual           6,343.10   diff +0.36
+     total paid        expected          38,842.74   actual          38,843.10   diff +0.36
+     schedule rows     60 expected, 60 actual, 60 differ (first at period 1)
+ PER0000004
+     level payment     expected             277.78   actual             277.77   diff -0.01
+     final payment     expected             277.70   actual             278.05   diff +0.35
+     schedule rows     36 expected, 36 actual, 36 differ (first at period 1)
+ COM0000006
+     status            expected OK      actual RJ E6
+ PER0000007
+     status            expected OK      actual RJ E6
+ MTG0000008
+     level payment     expected             556.39   actual             554.78   diff -1.61
+     final payment     expected             556.96   actual           1,135.81   diff +578.85
+     total interest    expected             300.97   actual             301.83   diff +0.86
+     total paid        expected         200,300.97   actual         200,301.83   diff +0.86
+     schedule rows     360 expected, 360 actual, 360 differ (first at period 1)
+ COM0000009
+     level payment     expected             374.93   actual             376.49   diff +1.56
+     final payment     expected             243.64   actual             317.25   diff +73.61
+     total interest    expected         119,093.65   actual          68,145.05   diff -50,948.60
+     total paid        expected         134,093.65   actual          83,145.05   diff -50,948.60
+     payments made     expected                358   actual                221
+     schedule rows     358 expected, 221 actual, 358 differ (first at period 1)
+ AUT0000010
+     level payment     expected             305.91   actual             305.87   diff -0.04
+     final payment     expected             305.54   actual             308.84   diff +3.30
+     total interest    expected           3,025.16   actual           3,025.62   diff +0.46
+     total paid        expected          22,025.15   actual          22,025.61   diff +0.46
+     schedule rows     72 expected, 72 actual, 72 differ (first at period 1)
+ COM0000011
+     status            expected RJ E5   actual OK   
+
+ SUMMARY: 14 cases, 4 passed, 10 failed
+================================================================================================

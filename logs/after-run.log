@@ -1,0 +1,48 @@
+######################################################################
+# LS0142 REGRESSION RUN - AFTER FIX  (src/PAYCALC.cbl)
+# 2026-10-28 15:52:10 UTC   cobc (GnuCOBOL) 3.1.2.0
+######################################################################
+
+//LOANRUN  STEP010 EXEC PGM=LOANCALC   PAYCALC=after
+//STEPLIB  DD build/after
+//LOANIN   DD data/LOANS.DAT
+//AMORTOUT DD output/after/AMORTOUT.DAT
+//LOANRPT  DD output/after/LOANRPT.TXT
+
+LOANCALC - LOAN AMORTIZATION BATCH STARTED  2026-10-28
+LOANCALC - REJECTED COM0000011 E5 PAYMENT EXCEEDS FIELD CAPACITY          
+LOANCALC - REJECTED BAD0000013 E3 TERM MUST BE 001 - 480 MONTHS           
+LOANCALC - REJECTED BAD0000014 E1 PRINCIPAL IS NOT NUMERIC                
+LOANCALC - RECORDS READ    : +0000014
+LOANCALC - LOANS ACCEPTED  : +0000011
+LOANCALC - LOANS REJECTED  : +0000003
+LOANCALC - AMORTOUT RECORDS: +000001860
+LOANCALC - ENDED, RETURN CODE +000000004
+
+STEP010 LOANCALC ENDED - COND CODE 0004
+
+================================================================================================
+ LOANCALC RESULT VERIFICATION - AFTER FIX  (src/PAYCALC.cbl)
+ input    : data/LOANS.DAT
+ expected : tests/expected/EXPECTED-RESULTS.txt
+ actual   : output/after/AMORTOUT.DAT
+================================================================================================
+ RESULT LOAN ID             EXPECTED          ACTUAL   CASE
+ ------ ----------    --------------  --------------   ----------------------------------------
+ PASS   MTG0000001          1,580.17        1,580.17   Standard 30-yr mortgage, 360 months
+ PASS   MTG0000002          2,933.76        2,933.76   15-yr mortgage, fractional rate
+ PASS   AUT0000003            647.38          647.38   60-month auto loan
+ PASS   PER0000004            277.78          277.78   Zero-interest loan (P / n path)
+ PASS   PER0000005          5,050.00        5,050.00   1-month term (payment = P * (1+r))
+ PASS   COM0000006      5,543,942.14    5,543,942.14   Very large principal (950,000,000.00)
+ PASS   PER0000007              0.09            0.09   Very small principal (1.00)
+ PASS   MTG0000008            556.39          556.39   Very low rate (0.01%), 360 months
+ PASS   COM0000009            374.93          374.93   High rate (29.99%), 360 months
+ PASS   AUT0000010            305.91          305.91   Half-cent rounding sensitivity
+ PASS   COM0000011         REJECT E5       REJECT E5   Payment exceeds field size -> reject
+ PASS   PER0000012              0.01            0.01   Tiny P, zero rate: payment 0.01
+ PASS   BAD0000013         REJECT E3       REJECT E3   Validation: zero term -> reject
+ PASS   BAD0000014         REJECT E1       REJECT E1   Validation: non-numeric principal
+
+ SUMMARY: 14 cases, 14 passed, 0 failed
+================================================================================================

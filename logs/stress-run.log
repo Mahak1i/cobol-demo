@@ -1,0 +1,27 @@
+LS0142 STRESS RUN - SEED 19980314, 2000 RANDOM LOANS, FIXED PAYCALC
+
+LOANCALC - LOAN AMORTIZATION BATCH STARTED  2026-10-28
+LOANCALC - RECORDS READ    : +0002000
+LOANCALC - LOANS ACCEPTED  : +0001648
+LOANCALC - LOANS REJECTED  : +0000352
+LOANCALC - AMORTOUT RECORDS: +000222122
+LOANCALC - ENDED, RETURN CODE +000000004
+
+ANSWER KEY OUTCOMES:
+   1648   OK 
+    352   RJ E6
+
+================================================================================================
+ LOANCALC RESULT VERIFICATION - STRESS SEED 19980314 (FAILURES ONLY)
+ input    : output/stress/STRESS.DAT
+ expected : output/stress/EXPECTED-STRESS.txt
+ actual   : output/stress/AMORTOUT.DAT
+================================================================================================
+ RESULT LOAN ID             EXPECTED          ACTUAL   CASE
+ ------ ----------    --------------  --------------   ----------------------------------------
+
+ SUMMARY: 2000 cases, 2000 passed, 0 failed
+================================================================================================
+
+SAME DECK WITH THE PRE-FIX PAYCALC (src/before/PAYCALC.cbl):
+ SUMMARY: 2000 cases, 514 passed, 1486 failed

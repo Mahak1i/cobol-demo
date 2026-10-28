@@ -1,0 +1,30 @@
+LS0142 FAULT ISOLATION - PRE-FIX PAYCALC WITH SELECTED FIXES APPLIED
+
+  FIX-1  widen P*R*(1+R)**N work field  S9(7)V99    -> S9(15)V9(16)
+  FIX-2  ROUNDED on the payment COMPUTEs (amortized and zero-rate)
+  FIX-3  widen R and (1+R)**N           V9(6) -> S9V9(18), 9(3)V9(6) -> S9(7)V9(24)
+  FIX-4  ON SIZE ERROR -> RC 20 (only in the final src/PAYCALC.cbl)
+
+  LOAN ID     NONE   FIX-1  FIX-2  FIX-3  FIX-1+2+3 ALL FOUR   CASE
+  ----------  ----   -----  -----  -----  --------- --------   ----
+  MTG0000001  FAIL   FAIL   FAIL   FAIL   PASS      PASS       Standard 30-yr mortgage, 360 months
+  MTG0000002  FAIL   FAIL   FAIL   FAIL   PASS      PASS       15-yr mortgage, fractional rate
+  AUT0000003  FAIL   FAIL   FAIL   FAIL   PASS      PASS       60-month auto loan
+  PER0000004  FAIL   FAIL   PASS   FAIL   PASS      PASS       Zero-interest loan (P / n path)
+  PER0000005  PASS   PASS   PASS   PASS   PASS      PASS       1-month term (payment = P * (1+r))
+  COM0000006  FAIL   FAIL   FAIL   FAIL   PASS      PASS       Very large principal (950,000,000.00)
+  PER0000007  FAIL   FAIL   FAIL   FAIL   PASS      PASS       Very small principal (1.00)
+  MTG0000008  FAIL   FAIL   FAIL   FAIL   PASS      PASS       Very low rate (0.01%), 360 months
+  COM0000009  FAIL   FAIL   FAIL   FAIL   PASS      PASS       High rate (29.99%), 360 months
+  AUT0000010  FAIL   FAIL   FAIL   FAIL   PASS      PASS       Half-cent rounding sensitivity
+  COM0000011  FAIL   FAIL   FAIL   FAIL   FAIL      PASS       Payment exceeds field size -> reject
+  PER0000012  PASS   PASS   PASS   PASS   PASS      PASS       Tiny P, zero rate: payment 0.01
+  BAD0000013  PASS   PASS   PASS   PASS   PASS      PASS       Validation: zero term -> reject
+  BAD0000014  PASS   PASS   PASS   PASS   PASS      PASS       Validation: non-numeric principal
+
+  none    passes  4 of 14
+  fix1    passes  4 of 14
+  fix2    passes  5 of 14
+  fix3    passes  4 of 14
+  fix123  passes 13 of 14
+  final   passes 14 of 14
